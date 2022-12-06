@@ -27,7 +27,7 @@ export const WheelComponent = ({
   const downTime = segments.length * downDuration
   let spinStart = 0
   let frames = 0
-  const centerX = 175
+  const centerX = 180
   const centerY = 180
   useEffect(() => {
     wheelInit()
@@ -39,6 +39,8 @@ export const WheelComponent = ({
     initCanvas()
     wheelDraw()
   }
+  const bgImage = new Image();
+  bgImage.src = '/images/wheel-bg.png';
 
   const initCanvas = () => {
     let canvas = document.getElementById('canvas')
@@ -46,7 +48,7 @@ export const WheelComponent = ({
     if (navigator.userAgent.indexOf('MSIE') !== -1) {
       canvas = document.createElement('canvas')
       canvas.setAttribute('width', 1000)
-      canvas.setAttribute('height', 600)
+      canvas.setAttribute('height', 700)
       canvas.setAttribute('id', 'canvas')
       document.getElementById('wheel').appendChild(canvas)
     }
@@ -122,16 +124,19 @@ export const WheelComponent = ({
     ctx.moveTo(centerX, centerY)
     ctx.arc(centerX, centerY, size, lastAngle, angle, false)
     ctx.lineTo(centerX, centerY)
+
     ctx.closePath()
     ctx.fillStyle = segColors[key]
-    ctx.fill()
+    //ctx.fill()
     ctx.stroke()
     ctx.save()
     ctx.translate(centerX, centerY)
     ctx.rotate((lastAngle + angle) / 2)
-    ctx.fillStyle = contrastColor
-    ctx.font = 'bold 9pt ' + fontFamily
-    ctx.fillText(value.substr(0, 21), size / 2 + 15, 0)
+
+    //ctx.fillStyle = contrastColor
+    //ctx.font = 'bold 9pt ' + fontFamily
+    //ctx.fillText(value.substr(0, 21), size / 2 + 15, 0)
+    ctx.drawImage(bgImage, -50,-50,50,50)
     ctx.restore()
   }
 
@@ -140,6 +145,7 @@ export const WheelComponent = ({
     let lastAngle = angleCurrent
     const len = segments.length
     const PI2 = Math.PI * 2
+    ctx.drawImage(bgImage, 0,0, 360, 360)
     ctx.lineWidth = 1
     ctx.strokeStyle = primaryColor
     ctx.textBaseline = 'middle'
@@ -170,7 +176,7 @@ export const WheelComponent = ({
     ctx.arc(centerX, centerY, size, 0, PI2, false)
     ctx.closePath()
 
-    ctx.lineWidth = 10
+    ctx.lineWidth = 1
     ctx.strokeStyle = primaryColor
     ctx.stroke()
   }

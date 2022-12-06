@@ -1,5 +1,4 @@
 // Import the functions you need from the SDKs you need
-import { FieldPath } from '@firebase/firestore-types'
 import { initializeApp } from 'firebase/app';
 import {
   getAuth,
@@ -14,6 +13,7 @@ import {
 import {
   getFirestore,
   doc,
+  documentId,
   getDoc,
   getDocs,
   setDoc,
@@ -141,16 +141,26 @@ export const getCurrentUser = () => {
   });
 };
 
+export async function getAllWheelPrizes() {
+  const prizes = [];
+  const querySnapshot = await getDocs(PrizesRef);
+  for await(let docSnaphot of querySnapshot) {
+    prizes.push(docSnaphot.data());
+  }
+  return prizes;
+}
 
 export async function getWheelPrizes(prizes) {
   const prizeSegments = [];
-  const prizeQuery = query(PrizesRef, where(FieldPath.documentId(), 'in', prizes));
-  const querySnapshot = await getDocs(prizeQuery);
-  querySnapshot.forEach(doc => {
-    const data = doc.data();
-    console.log('data: ', data);
-    prizeSegments.push(data);
-  })
+  const promisesArr = [];
+  for await(let prize of prizes) {
+    promisesArr.push(getDoc(doc(db, 'Prizes', prize)))
+  }
+  const resolved = await Promise.all(promisesArr);
+  console.log(resolved);
+  for await(let segmentSnapshot of resolved) {
+    prizeSegments.push(segmentSnapshot.data());
+  }
   return prizeSegments;
 }
 

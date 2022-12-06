@@ -19,7 +19,7 @@
     "react-dom": "^18.2.0",
     "react-imask": "^6.4.3",
     "react-router-dom": "^6.4.3",
-    "react-wheel-of-prizes": "^1.0.9"
+    "@firebase/firestore-types": "^2.5.1"
   },
   "devDependencies": {
     "@types/react": "^18.0.22",
