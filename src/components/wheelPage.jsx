@@ -1,21 +1,11 @@
 import React from 'react';
+import { useWheel } from '../context/wheel.jsx'
 import { WheelComponent } from './wheelComponent';
 
-import { useCustomer } from '../context/customer';
-
 export const Wheel = () => {
-  const {formData, setFormData} = useCustomer();
+  const {wheelSettings} = useWheel();
+  const prizes = wheelSettings?.segments?.map(segment => segment.display);
 
-  const prizes = [
-    'better luck next time',
-    'won 70',
-    'won 10',
-    'better luck next time',
-    'won 2',
-    'won uber pass',
-    'better luck next time',
-    'won a voucher'
-  ];
 
   const segColors = [
     '#EE4040',
@@ -29,16 +19,12 @@ export const Wheel = () => {
   ];
 
   const onFinished = (winner) => {
-    setFormData({
-      ...formData,
-      coupon: winner
-    })
     console.log(winner)
   }
 
   return (
     <div>
-    {formData.coupon}
+      { wheelSettings &&
     <WheelComponent
       segments={prizes}
       segColors={segColors}
@@ -50,7 +36,7 @@ export const Wheel = () => {
       upDuration={400}
       downDuration={600}
       size={165}
-    />
+    /> }
     </div>
   )
 }

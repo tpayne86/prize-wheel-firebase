@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useReducer } from 'react'
 import {
   onAuthStateChangedListener,
   createUserDocumentFromAuth,
-} from '../utils/firebase/firebase.utils';
+} from '../utils/firebase';
 
 export const UserContext = createContext({
   setCurrentUser: () => null,
@@ -37,9 +37,6 @@ export const UserProvider = ({ children }) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChangedListener((user) => {
-      if (user) {
-        createUserDocumentFromAuth(user);
-      }
       setCurrentUser(user);
     });
 
@@ -48,6 +45,7 @@ export const UserProvider = ({ children }) => {
 
   const value = {
     currentUser,
+    setCurrentUser
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

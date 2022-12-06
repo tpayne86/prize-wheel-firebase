@@ -1,15 +1,16 @@
-import { createContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect, useContext } from 'react'
+import { useLocation, useParams } from 'react-router-dom'
 
-import { getWheelHistory, getWheelSettings } from '../utils/firebase.js';
+import { getWheelSettings } from '../utils/firebase.js';
 import { useUser } from './user.jsx'
 
 export const WheelContext = createContext({
-  wheelHistory: [],
-  isAbleToSpin: false,
-  setCurrentWheel: () => null
+  wheelSettings: {}
 })
 
-export const WheelContext = ({children}) => {
+export const WheelProvider = ({children}) => {
+  const location = useLocation();
+  const { wheelId:id } = useParams();
   const {currentUser} = useUser();
   const [wheelId, setWheelId] = useState("")
   const [wheelSettings, setWheelSettings] = useState(null);
@@ -17,26 +18,28 @@ export const WheelContext = ({children}) => {
   const [wheelHistory, setWheelHistory] = useState([]);
 
   useEffect(() => {
-    const fetchHistoryAndSettings = async () => {
-      const wheelSettingsResponse = await getWheelSettings(wheelId);
-      const wheelHistoryResponse = await getWheelHistory(currentUser, wheelId)
-      if(wheelHistoryResponse.length === 0) {
-        setIsAbleToSpin(true);
+    if(location.pathname.includes('spin')) {
+      setWheelId(id);
+    }
+  }, [])
+
+  useEffect(() => {
+    if(wheelId) {
+      const fetchWheelSettings = async () => {
+        const settings = await getWheelSettings(wheelId);
+        console.log(settings);
+        setWheelSettings(settings);
       }
-      if(wheelHistoryResponse[0].spinnedAt > )
+      fetchWheelSettings()
     }
   }, [wheelId])
 
-  useEffect(() => {
-    const fetchWheelSettings = async () => {
-      const wheelSettingsResponse = await getWheelParams(wheelId);
-    }
-  }, [isAbleToSpin])
-
-  const value = {setWheelId, wheelSettings, isAbleToSpin}
+  const value = {wheelSettings}
   return (
     <WheelContext.Provider value={value}>
       {children}
     </WheelContext.Provider>
   );
 }
+
+export const useWheel = () => useContext(WheelContext);

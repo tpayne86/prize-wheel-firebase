@@ -1,4 +1,5 @@
 // Import the functions you need from the SDKs you need
+import { FieldPath } from '@firebase/firestore-types'
 import { initializeApp } from 'firebase/app';
 import {
   getAuth,
@@ -17,6 +18,7 @@ import {
   getDocs,
   setDoc,
   collection,
+  where,
   writeBatch,
   query,
 } from 'firebase/firestore';
@@ -50,6 +52,10 @@ export const signInWithGoogleRedirect = () =>
   signInWithRedirect(auth, googleProvider);
 
 export const db = getFirestore();
+const PrizesRef = collection(db, 'Prizes');
+const UserRef = collection(db, 'User');
+const WheelHistoryRef = collection(db, 'WheelHistory');
+const WheelSettingsRef = collection(db, 'Wheels')
 
 export const addCollectionAndDocuments = async (
   collectionKey,
@@ -82,7 +88,7 @@ export const createUserDocumentFromAuth = async (
 ) => {
   if (!userAuth) return;
 
-  const userDocRef = doc(db, 'users', userAuth.uid);
+  const userDocRef = doc(db, 'User', userAuth.uid);
 
   const userSnapshot = await getDoc(userDocRef);
 
@@ -134,3 +140,31 @@ export const getCurrentUser = () => {
     );
   });
 };
+
+
+export async function getWheelPrizes(prizes) {
+  const prizeSegments = [];
+  const prizeQuery = query(PrizesRef, where(FieldPath.documentId(), 'in', prizes));
+  const querySnapshot = await getDocs(prizeQuery);
+  querySnapshot.forEach(doc => {
+    const data = doc.data();
+    console.log('data: ', data);
+    prizeSegments.push(data);
+  })
+  return prizeSegments;
+}
+
+export async function getWheelSettings(id) {
+  const wheelRef = doc(db, 'Wheels', id);
+  const docSnap = await getDoc(wheelRef);
+  if (docSnap.exists()) {
+    const data = docSnap.data();
+    console.log(data);
+    const segments = await getWheelPrizes(data.segments);
+    console.log(segments)
+    return {
+      ...data,
+      segments
+    };
+  }
+}
